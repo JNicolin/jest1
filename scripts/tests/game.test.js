@@ -1,4 +1,4 @@
-const { game, newGame, showScore, addTurn } = require("../game");
+const { game, newGame, showScore, addTurn, lightsOn, showTurns } = require("../game");
 
 
 beforeAll(() => {
@@ -25,6 +25,9 @@ describe("game object contains correct keys", () => {
     test("choices contain correct ids", () => {
         expect(game.choices).toEqual(["button1", "button2", "button3", "button4"]);
     });
+    test("should return the value of turnNumber", () => {
+        expect("turnNumber" in game).toBe(true);
+    }); 
 });
 
 describe("newGame works correctly", () => {
@@ -47,4 +50,39 @@ describe("newGame works correctly", () => {
     test("should be a value in the computer sequence array", () => {
         expect(game.currentGame.length).toBe(1);
     });
+    test("expect data-listener to be true", () => {
+        newGame();
+        const elements = document.getElementsByClassName("circle");
+        for (let element of elements) {
+            expect(element.getAttribute("data-listener")).toEqual("true");
+        }
+    });
 });
+
+describe ("game play function works as expected", () => {
+        beforeEach(() => {
+            game.score = 0;
+            game.playerMoves = [];
+            game.currentGame = [];
+            addTurn();
+        });
+        afterEach(() => {
+            game.score = 0;
+            game.playerMoves = [];
+            game.currentGame = [];
+        });
+        test("addTurn adds a new turn to the current game", () => {
+            addTurn();
+            expect(game.currentGame.length).toBe(2);
+        });
+        test("The correct class should be added when runinng the lightsOn function", () => {
+            let button = document.getElementById(game.currentGame[0]);
+            lightsOn(game.currentGame[0]);
+            expect(button.classList).toContain("light");
+        });
+        test ("showTurns function should update the game.turnNumber", () => {
+            game.turnNumber = 33;
+            showTurns();
+            expect(game.turnNumber).toBe(0);
+        });
+    });
