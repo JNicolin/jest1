@@ -1,5 +1,6 @@
-const { game, newGame, showScore, addTurn, lightsOn, showTurns } = require("../game");
+const { game, newGame, showScore, addTurn, lightsOn, showTurns, playerTurn } = require("../game");
 
+jest.spyOn(window, "alert").mockImplementation( () => {});
 
 beforeAll(() => {
     let fs = require("fs");
@@ -25,9 +26,18 @@ describe("game object contains correct keys", () => {
     test("choices contain correct ids", () => {
         expect(game.choices).toEqual(["button1", "button2", "button3", "button4"]);
     });
-    test("should return the value of turnNumber", () => {
+    test("turnNumber key exists", () => {
         expect("turnNumber" in game).toBe(true);
-    }); 
+    });
+    test("lastButton key exists", () => {
+        expect("lastButton" in game).toBe(true);
+    });
+    test("turnInProgress key exists", () => {
+        expect("turnInProgress" in game).toBe(true);
+    });
+    test("turnInProgress key value is false", () => {
+        expect("turnInProgress" in game).toBe(true);
+    });
 });
 
 describe("newGame works correctly", () => {
@@ -84,5 +94,21 @@ describe ("game play function works as expected", () => {
             game.turnNumber = 33;
             showTurns();
             expect(game.turnNumber).toBe(0);
+        });
+        test("should increment the score if the turn is correct", () => {
+            game.playerMoves.push(game.currentGame[0]);
+            playerTurn();
+            expect(game.score).toBe(1);
+        });
+        test("should return an error if wrong move", () =>{
+            game.playerMoves.push("wrong");
+            playerTurn();
+            expect(window.alert).toBeCalledWith("Wrong move!");
+        });
+        test("clicking during computer sequence should fail", () => {
+            showTurns();
+            game.lastButton = "";
+            document.getElementById("button2").click();
+            expect(game.lastButton).toEqual("");
         });
     });
